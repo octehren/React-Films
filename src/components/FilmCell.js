@@ -1,21 +1,10 @@
 import React, { Component } from 'react';
 
-class MainPage extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        }
-    }
-
-    componentDidMount() {
-        
-    }
-
+class FilmCell extends Component {
     render() {
         return (
             <ul>
-                <p><h3>{this.props.filmTitle}</h3></p>
+                <h3><p>{this.props.filmTitle}</p></h3>
                 <li>{this.props.description}</li>
                 <li>{`Buy: ${this.props.priceBuy} Rent: ${this.props.priceRent}`}</li>
             </ul>
@@ -23,4 +12,4 @@ class MainPage extends Component {
     }
 }
 
-export default MainPage;
+export default FilmCell;
