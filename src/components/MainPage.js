@@ -18,16 +18,15 @@ class MainPage extends Component {
             seriesPage: 1,
             moviesPage: 1
         }
-        this.toggleDisplayedContent = this.toggleDisplayedContent.bind(this);
     }
 
     componentDidMount() {
 
     }
 
-    toggleDisplayedContent = (clickedButton) => { 
-        console.log(clickedButton);
-        if (clickedButton !== this.state.activeButton) this.setState({ activeButton: (clickedButton + 1) % 2});
+    toggleDisplayedContent = (clickedButton) => {
+        const activeButton = this.state.activeButton;
+        if (clickedButton !== activeButton) this.setState({ activeButton: (activeButton + 1) % 2});
     }
 
     render() {
@@ -36,8 +35,9 @@ class MainPage extends Component {
                 {   this.state.displayedContents.map((contentName, index) => {
                         return (
                             <ButtonContent 
-                            onClick={() => { this.toggleDisplayedContent(index)} } 
-                            label={contentName} 
+                            onClick={ this.toggleDisplayedContent }
+                            label={contentName}
+                            buttonID={index}
                             key={index} 
                             isActive={this.state.activeButton === index} 
                             />
@@ -53,7 +53,7 @@ class MainPage extends Component {
                             description={film.description} 
                             priceBuy={film.prices.buy} 
                             priceRent={film.prices.rent} 
-                            episodes={film.total_episodes} 
+                            totalEpisodes={film.total_episodes} 
                             />
                         );
                     })
