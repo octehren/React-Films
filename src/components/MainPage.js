@@ -7,6 +7,9 @@ filmData["tv_seasons"].forEach(function(series)
         series["total_episodes"] = series.episodes.length;
     }
 );
+const displayedContents = ["Movies", "TV Series"];
+const alternateColors = ["pink", "gray", "gold", "blue", "red"];
+const numColors = alternateColors.length;
 
 class MainPage extends Component {
     constructor(props) {
@@ -14,7 +17,6 @@ class MainPage extends Component {
         this.state = {
             activeButton: 0,
             filmData: [filmData["films"], filmData["tv_seasons"]],
-            displayedContents: ["Movies", "TV Series"],
             seriesPage: 1,
             moviesPage: 1
         }
@@ -31,33 +33,39 @@ class MainPage extends Component {
 
     render() {
         return (
-            <div className="container">
-                {   this.state.displayedContents.map((contentName, index) => {
-                        return (
-                            <ButtonContent 
-                            onClick={ this.toggleDisplayedContent }
-                            label={contentName}
-                            buttonID={index}
-                            key={index} 
-                            isActive={this.state.activeButton === index} 
-                            />
-                        )
-                    })
-                
-                }
-                {   this.state.filmData[this.state.activeButton].map((film, index) => {
-                        return (
-                            <FilmCell
-                            key={index}
-                            filmTitle={film.name} 
-                            description={film.description} 
-                            priceBuy={film.prices.buy} 
-                            priceRent={film.prices.rent} 
-                            totalEpisodes={film.total_episodes} 
-                            />
-                        );
-                    })
-                }
+            <div>
+                <div className="container hero">
+                    <div className="content-buttons">
+                    {   displayedContents.map((contentName, index) => {
+                            return (
+                                <ButtonContent 
+                                onClick={this.toggleDisplayedContent}
+                                label={contentName}
+                                buttonID={index}
+                                key={index} 
+                                isActive={this.state.activeButton === index} 
+                                />
+                            )
+                        })
+                    }
+                    </div>
+                </div>
+                <div className="container">
+                    {   this.state.filmData[this.state.activeButton].map((film, index) => {
+                            return (
+                                <FilmCell
+                                className={`row ${alternateColors[index % numColors]}`}
+                                key={index}
+                                filmTitle={film.name} 
+                                description={film.description} 
+                                priceBuy={film.prices.buy} 
+                                priceRent={film.prices.rent} 
+                                totalEpisodes={film.total_episodes} 
+                                />
+                            );
+                        })
+                    }
+                </div>
             </div>
         )
     }

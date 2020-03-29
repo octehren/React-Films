@@ -1,0 +1,40 @@
+.button {
+    font-family: inherit; /* 1 */
+    font-size: 100%; /* 1 */
+    line-height: 1.15; /* 1 */
+    margin: 0; /* 2 */
+  }
+  
+.active-button {
+  background-color: #FF1234;
+}
+  
+.content-buttons {
+  display:flex;
+  justify-content:space-between;
+  padding: 3% 25% 3% 25%;
+}
+/* colors */ 
+.pink {
+    background: #ffdae0;
+  }
+  
+  .gray {
+    background: #e7f0da;
+  }
+  
+  .green {
+    background: #ddebd0;
+  }
+  
+  .gold {
+    background: #fcf5b6;
+  }
+  
+  .blue {
+    background: #cae9ef;
+  }
+  
+  .red {
+    background: #f8c9c1;
+  }
