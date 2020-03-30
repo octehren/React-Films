@@ -37,8 +37,8 @@ class MainPage extends Component {
                     "description": filmData.overview,
                     "totalEpisodes": filmData.totalEpisodes,
                     "prices": {
-                        "buy": 10,
-                        "rent": 10
+                        "buy": Math.floor((Math.random() * 500) + 500),
+                        "rent": Math.floor((Math.random() * 250) + 250)
                     }
                 });
             });
