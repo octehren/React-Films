@@ -42,9 +42,12 @@ class MainPage extends Component {
                     }
                 });
             });
+            const activeButton = this.state.activeButton;
             let updatedFilmData = this.state.filmData;
-            updatedFilmData[this.state.activeButton] = [...formatted, ...updatedFilmData[this.state.activeButton]];
-            this.setState({filmData: updatedFilmData}, () => { 
+            updatedFilmData[activeButton] = [...formatted, ...updatedFilmData[activeButton]];
+            let incrementedCounter = this.state.respectiveContentPages;
+            incrementedCounter[activeButton] = incrementedCounter[activeButton] + 1;
+            this.setState({filmData: updatedFilmData, respectiveContentPages: incrementedCounter}, () => { 
                 this.setState({externalFilmData: []})
             });
         }
