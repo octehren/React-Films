@@ -127,7 +127,7 @@ class MainPage extends Component {
             <div>
                 <div className="container hero">
                     <div className="content-buttons">
-                        <button onClick={this.fetchExternalContent} className={`button is-info is-rounded ${this.state.isActive ? "is-focused" : ""}`} >
+                        <button onClick={this.fetchExternalContent} className={`button is-info is-rounded ${this.state.requesting ? "is-focused" : ""}`} >
                             {this.state.requestButtonLabel}
                         </button>
                         {   displayedContents.map((contentName, index) => {
