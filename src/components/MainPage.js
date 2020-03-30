@@ -10,7 +10,7 @@ filmData["tv_seasons"].forEach(function(series)
 const displayedContents = ["Movies", "TV Series"];
 const alternateColors = ["pink", "gray", "gold", "blue", "red"];
 const numColors = alternateColors.length;
-const apiKey = "5215a9b636f2a7eb6edef75d09a921da"; // ideally this would be hidden in a local variable
+const apiKey = "5215a9b636f2a7eb6edef75d09a921da"; // ideally this would be hidden in a local variable, but the API is public anyway
 
 class MainPage extends Component {
     constructor(props) {
@@ -19,7 +19,8 @@ class MainPage extends Component {
             activeButton: 0,
             filmData: [filmData["films"], filmData["tv_seasons"]],
             respectiveContentPages: [1, 1], // index 0 is movies, index 1 is tv series, etc. correlates w/ displayedContents
-            externalFilmData: []
+            externalFilmData: [],
+            requesting: false
         }
     }
 
@@ -66,34 +67,55 @@ class MainPage extends Component {
     }
 
     fetchExternalContent = () => {
+        if (this.state.currentlyRequesting) { // blocks further requests
+            alert("A little more patience, please."); 
+            throw "excessive number of requests";
+        }
+        this.setState({currentlyRequesting: true});
         const contentIndex = this.state.activeButton; // 0 for movies, 1 for series
         const pagetoFetch = this.state.respectiveContentPages[contentIndex]; 
         const contentTypeParam = ["movie", "tv"][this.state.activeButton]; // 1 for movies, 2 for series
         const url = `https://api.themoviedb.org/3/discover/${contentTypeParam}?api_key=${apiKey}&page=${pagetoFetch}`;
         let request = new Request(url);
         request.headers.append('Content-Type', 'application/json');
-        fetch(request)
-        .then((response) => {
-            return response.text();
-        }).then((text) => {
-            let results = JSON.parse(text)["results"].slice(0, 3);
-            if (contentTypeParam === "tv") {
-                let promises = [];
-                results.forEach((tvShow) => { 
-                    promises.push(this.fetchNumOfTVShowEpisodes(tvShow));
-                });
-                Promise.allSettled(promises).then((totalEpisodes) => {
-                    results.map((tvShow, index) => {
-                        //normalizes 'title' with the 'name'
-                        tvShow.title = tvShow.name;
-                        tvShow.totalEpisodes = totalEpisodes[index].value;
+        try {
+            fetch(request)
+            .then((response) => {
+                return response.text();
+            }).then((text) => {
+                let results = JSON.parse(text)["results"].slice(0, 3);
+                // if movies were fetched, updates the state and rerenders list.
+                // otherwise, if TV shows were fetched, goes on an aditional cycle of
+                // fetching external information for each fetched tv show
+                if (contentTypeParam === "tv") {
+                    let promises = [];
+                    results.forEach((tvShow) => { 
+                        promises.push(this.fetchNumOfTVShowEpisodes(tvShow));
                     });
+                    // executes 'then' block only after all additional info
+                    // is fetched for all of the tv shows in 'results' array
+                    Promise.allSettled(promises)
+                    .then((totalEpisodes) => {
+                        results.map((tvShow, index) => {
+                            //normalizes 'title' with the 'name'
+                            tvShow.title = tvShow.name;
+                            tvShow.totalEpisodes = totalEpisodes[index].value;
+                        });
+                        this.setState({externalFilmData: results}, () => { this.updateFilmData(); });
+                    })
+                } else {
                     this.setState({externalFilmData: results}, () => { this.updateFilmData(); });
-                })
-            } else {
-                this.setState({externalFilmData: results}, () => { this.updateFilmData(); });
-            }
-        })
+                }
+            }).catch((error) => {
+                throw error;
+            })
+            .finally(() => {
+            // whether the request was successful or not, requests are allowed again
+            this.setState({currentlyRequesting: false});
+            });
+        } catch(error) {
+            alert("Request failed with error:" + error)
+        }
     }
 
     render() {
