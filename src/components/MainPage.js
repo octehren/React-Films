@@ -23,16 +23,31 @@ class MainPage extends Component {
         }
     }
 
-    componentDidMount() {
-        if (this.state.externalFilmData.length > 0) {
-            console.log(this.state.externalFilmData);
-            this.setState({externalFilmData: []});
-        }
-    }
-
     toggleDisplayedContent = (clickedButton) => {
         const activeButton = this.state.activeButton;
         if (clickedButton !== activeButton) this.setState({ activeButton: (activeButton + 1) % 2});
+    }
+
+    updateFilmData = () => {
+        if (this.state.externalFilmData.length > 0) {
+            let formatted = [];
+            this.state.externalFilmData.forEach((filmData) => {
+                formatted.push({
+                    "name": filmData.title,
+                    "description": filmData.overview,
+                    "totalEpisodes": filmData.totalEpisodes,
+                    "prices": {
+                        "buy": 10,
+                        "rent": 10
+                    }
+                });
+            });
+            let updatedFilmData = this.state.filmData;
+            updatedFilmData[this.state.activeButton] = [...formatted, ...updatedFilmData[this.state.activeButton]];
+            this.setState({filmData: updatedFilmData}, () => { 
+                this.setState({externalFilmData: []})
+            });
+        }
     }
 
     fetchNumOfTVShowEpisodes = (tvShow) => {
@@ -66,12 +81,14 @@ class MainPage extends Component {
                 });
                 Promise.allSettled(promises).then((totalEpisodes) => {
                     results.map((tvShow, index) => {
-                        tvShow.totalEpisodes = totalEpisodes[index];
+                        //normalizes 'title' with the 'name'
+                        tvShow.title = tvShow.name;
+                        tvShow.totalEpisodes = totalEpisodes[index].value;
                     });
-                    this.setState({externalFilmData: results});
+                    this.setState({externalFilmData: results}, () => { this.updateFilmData(); });
                 })
             } else {
-                this.setState({externalFilmData: results});
+                this.setState({externalFilmData: results}, () => { this.updateFilmData(); });
             }
         })
     }
@@ -81,7 +98,7 @@ class MainPage extends Component {
             <div>
                 <div className="container hero">
                     <div className="content-buttons">
-                        <button class="button is-info is-round" onClick={this.fetchExternalContent}>
+                        <button className="button is-info is-round" onClick={this.fetchExternalContent}>
                             See More {displayedContents[this.state.activeButton]}
                         </button>
                         {   displayedContents.map((contentName, index) => {
@@ -89,7 +106,7 @@ class MainPage extends Component {
                                     <ButtonContent 
                                     onClick={this.toggleDisplayedContent}
                                     label={contentName}
-                                    buttonID={index}
+                                    btn={index}
                                     key={index} 
                                     isActive={this.state.activeButton === index} 
                                     />
