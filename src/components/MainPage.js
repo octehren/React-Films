@@ -20,13 +20,18 @@ class MainPage extends Component {
             filmData: [filmData["films"], filmData["tv_seasons"]],
             respectiveContentPages: [1, 1], // index 0 is movies, index 1 is tv series, etc. correlates w/ displayedContents
             externalFilmData: [],
-            requesting: false
+            requesting: false,
+            requestButtonLabel: "Get More: Movies"
         }
     }
 
     toggleDisplayedContent = (clickedButton) => {
         const activeButton = this.state.activeButton;
-        if (clickedButton !== activeButton) this.setState({ activeButton: (activeButton + 1) % 2});
+        if (clickedButton !== activeButton) {
+            this.setState({ activeButton: (activeButton + 1) % 2}, () => { 
+                this.setState({requestButtonLabel: "Get More: " + displayedContents[this.state.activeButton]});
+            });
+        }
     }
 
     updateFilmData = () => {
@@ -71,7 +76,7 @@ class MainPage extends Component {
             alert("A little more patience, please."); 
             throw "excessive number of requests";
         }
-        this.setState({currentlyRequesting: true});
+        this.setState({currentlyRequesting: true, requestButtonLabel: "Loading......"});
         const contentIndex = this.state.activeButton; // 0 for movies, 1 for series
         const pagetoFetch = this.state.respectiveContentPages[contentIndex]; 
         const contentTypeParam = ["movie", "tv"][this.state.activeButton]; // 1 for movies, 2 for series
@@ -108,10 +113,9 @@ class MainPage extends Component {
                 }
             }).catch((error) => {
                 throw error;
-            })
-            .finally(() => {
-            // whether the request was successful or not, requests are allowed again
-            this.setState({currentlyRequesting: false});
+            }).finally(() => {
+                // whether the request was successful or not, requests are allowed again
+                this.setState({currentlyRequesting: false, requestButtonLabel: "Get More: " + displayedContents[this.state.activeButton]});
             });
         } catch(error) {
             alert("Request failed with error:" + error)
@@ -123,13 +127,13 @@ class MainPage extends Component {
             <div>
                 <div className="container hero">
                     <div className="content-buttons">
-                        <button className="button is-info is-round" onClick={this.fetchExternalContent}>
-                            See More {displayedContents[this.state.activeButton]}
+                        <button onClick={this.fetchExternalContent} className={`button is-info is-rounded ${this.state.isActive ? "is-focused" : ""}`} >
+                            {this.state.requestButtonLabel}
                         </button>
                         {   displayedContents.map((contentName, index) => {
                                 return (
                                     <ButtonContent 
-                                    onClick={this.toggleDisplayedContent}
+                                    onClick={() => {this.toggleDisplayedContent(index)}}
                                     label={contentName}
                                     btn={index}
                                     key={index} 

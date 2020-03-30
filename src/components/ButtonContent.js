@@ -7,8 +7,8 @@ class ButtonContent extends Component {
         )
     }
 
-    handleClick = () => {
-        this.props.onClick(this.props.btn);
+    handleClick = (e) => {
+        this.props.onClick(e);
     }
 }
 
